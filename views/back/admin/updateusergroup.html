@@ -1,0 +1,27 @@
+<div class="row">
+    <div class="col-lg-12">
+        <section class="panel">
+            <?php
+                if(isset($data['group_name'])){
+            ?>
+            <header class="panel-heading">
+                Update "<?php echo $data['group_name']; ?>"Category
+            </header>
+            <div class="panel-body">
+                <form role="form" action="updateusergroup.php" method="POST">
+                    <div class="form-group">
+                        <label for="groupName">Group Name</label>
+                        <input type="text" class="form-control" value="<?php echo $data['group_name']; ?>" name="groupName"placeholder="Enter Group Name">
+                    </div>
+                    <input type="hidden" name="groupId" value="<?php echo $data['group_id']; ?>">
+                    
+                    <input type="submit" class="btn btn-success" value="Update Group">
+                </form>
+
+            </div>
+        </section>
+        <?php
+            }
+        ?>
+    </div>
+</div>

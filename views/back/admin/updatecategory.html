@@ -1,0 +1,27 @@
+<div class="row">
+    <div class="col-lg-12">
+        <section class="panel">
+            <?php
+                if(isset($data['category_name'])){
+            ?>
+            <header class="panel-heading">
+                Update "<?php echo $data['category_name']; ?>"Category
+            </header>
+            <div class="panel-body">
+                <form role="form" action="updatecategory.php" method="POST">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Category Name</label>
+                        <input type="text" class="form-control" value="<?php echo $data['category_name']; ?>" name="categoryName"placeholder="Enter Category Name">
+                    </div>
+                    <input type="hidden" name="categoryId" value="<?php echo $data['category_id']; ?>">
+                    
+                    <input type="submit" class="btn btn-success" value="Update Category">
+                </form>
+
+            </div>
+        </section>
+        <?php
+            }
+        ?>
+    </div>
+</div>

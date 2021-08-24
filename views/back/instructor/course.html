@@ -1,0 +1,213 @@
+<?php
+
+if (isset($data) && !empty($data)) {
+    ?>
+    <div class="row">
+        <div class="col-md-12">
+            <section class="panel">
+                <div class="panel-body" style="display: flex; align-items: center;">
+                    <div class="col-md-6">
+                        <div class="pro-img-details" style="height: 400px;">
+                            <img src="../<?php echo $data['course_details']['course_cover'] ?>" alt="" style="height: 100%;">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h3 class="pro-d-title">
+                            <!-- <a href="#" class=""> -->
+                                <?php echo $data['course_details']['course_title'] ?>
+                            <!-- </a> -->
+                        </h3>
+                        <p>
+                            <?php echo $data['course_details']['course_description'] ?>
+                        </p>
+                        <div class="product_meta">
+                            <span class="posted_in">
+                                <strong>Created At:</strong>
+                                <?php echo $data['course_details']['created_at'] ?>
+                            </span>
+                        </div>
+
+                        <div class="m-bot15">
+                            <strong>Price: </strong> 
+                            <span class="pro-price">
+                                $<?php echo $data['course_details']['course_price'] ?>
+                            </span>
+                        </div>
+                        
+                        <div class="product_meta">
+                            <strong>Students Registered:</strong>
+                            <span class="posted_in pro-price" style="display: inline-block;">
+                                <?php print_r($data['course_details']['students_no']) ?>
+                            </span>
+                        </div>
+                        
+                        <div class="m-bot15">
+                            <strong>Rate: </strong> 
+                            <span class="pro-price">
+                                <?php echo $data['course_details']['rate'] ?>
+                            </span>
+                        </div>
+                        
+                        <div class="product_meta">
+                            <strong>Sections:</strong>
+                            <span class="posted_in pro-price" style="display: inline-block;">
+                                <?php print_r($data['course_details']['sections_no']) ?>
+                            </span>
+                        </div>
+                        
+                        <div class="m-bot15">
+                            <strong>Lessons: </strong> 
+                            <span class="pro-price">
+                                <?php echo $data['course_details']['lessons_no'] ?>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel">
+                <header class="panel-heading tab-bg-dark-navy-blue">
+                    <ul class="nav nav-tabs ">
+                        <li class="active">
+                            <a data-toggle="tab" href="#lessons">
+                                Lessons
+                            </a>
+                        </li>
+                        <li>
+                            <a data-toggle="tab" href="#students">
+                                Students Registered
+                            </a>
+                        </li>
+                    </ul>
+                </header>
+                <div class="panel-body">
+                    <div class="tab-content tasi-tab">
+                        <div id="lessons" class="tab-pane active">
+                            <?php 
+                            if(is_array($data['course'][0])){
+                                foreach($data['course'] as $course){ 
+                                ?>
+                            <section class="panel" style="margin-bottom: 20px;">
+                                <div class="panel-heading">
+                                    <!-- <div class="task-progress"> -->
+                                        <h4 style="color: #39b5aa;"><?php echo $course['section_title'] ?></h4>
+                                    <!-- </div> -->
+                                </div>
+                                <div class="panel-body progress-panel">
+                                    <?php if(is_array($course['lessons'])){ ?>
+                                    <table class="table table-hover table-striped table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th></th>
+                                                <th>Lesson Title</th>
+                                                <th>Lesson Description</th>
+                                                <th>Duration</th>
+                                                <th>Control</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        <?php foreach($course['lessons'] as $lesson){ ?>
+                                        <tr>
+                                            <td>
+                                                <div class="task-thumb">
+                                                    <img src="../<?php echo $lesson['lesson_cover']; ?>" alt="">
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <p><?php echo $lesson['lesson_title']; ?></p>
+                                            </td>
+                                            <td>
+                                                <p><?php echo $lesson['lesson_description']; ?></p>
+                                            </td>
+                                            <td>
+                                            <p class="pull-left"><?php echo $lesson['lesson_duration']; ?></p>
+                                            </td>
+                                            <td>
+                                                <a href="updatelesson.php?id='.$lesson['lesson_id'].'" class="btn btn-info"><i class="icon-refresh"></i> Edit</a>
+                                                <a href="deletelesson.php?id='.$lesson['lesson_id'].'" class="btn btn-danger"><i class="icon-trash"></i> Delete</a>
+                                            </td>
+                                        </tr>
+                                        <?php } ?>
+                                        </tbody>
+                                    </table>
+                                    <?php } else {?>
+                                    <div class="alert alert-block alert-danger">
+                                        <p class="text-danger"><?php echo $course['lessons']; ?></p>
+                                    </div>
+                                    <?php } ?>
+                                    <a href="addsectionlesson.php?id=<?php echo $course['section_id']?>&courseid=<?php echo $data['course_details']['course_id'] ?>" class="btn btn-success text-info" style="color: #fff;"><i class="icon-plus"></i> Add Lesson</a>
+                                </div>
+                            </section>
+                            <?php 
+                                }
+                            } else {?>
+                                <div class="alert alert-block alert-danger">
+                                    <p class="text-danger"><?php echo $data['course'][0]; ?></p>
+                                </div>
+                            <?php } ?>
+                            <button class="btn btn-success text-info add_sec"><i class="icon-plus"></i> Add Section</button>
+                            <form action="addcoursesection.php" method="POST" class="section_form">
+                                <input type="hidden" name="course_id" value="<?php echo $data['course_details']['course_id'] ?>">
+                                <div class="form-group">
+                                    <label for="section_name" name="section_name">Section Name</label>
+                                    <input type="text" class="form-control" id="section_name" name="section_name" placeholder="Enter Section Name">
+                                </div>
+                                <input type="submit" class="btn btn-success" value="Add">
+                            </form>
+                        </div>
+                        <div class="tab-pane" id="students">
+                            <?php 
+                            if(is_array($data['students'])){
+                                foreach($data['students'] as $student){ 
+                                ?>
+                                <table class="table table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Username</th>
+                                        <th>Email</th>
+                                        <th>Approved</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="task-thumb">
+                                                <img src="<?php echo $student['image'] ?>" alt="">
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <a href="profile.php?id=<?php echo $student['user_id'] ?>">
+                                                <h4><?php echo $student['username'] ?></h4>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <h4><?php echo $student['email'] ?></h4>
+                                        </td>
+                                        <td>
+                                            <?php if ($student['is_approved'] == 1){
+                                                echo '<button class="btn disabled btn-sm"><i class="icon-ok"></i></button>';
+                                            } else {
+                                                echo '<a href="approvestudentd.php?id=$sudent[\'user_id\']" class="btn btn-success btn-sm">Approve</a>';
+                                            } ?>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <?php 
+                                }
+                             } else { ?>
+                                <div class="alert alert-block alert-danger">
+                                    <p class="text-danger"><?php echo $data['students']; ?></p>
+                                </div>
+                            <?php } ?>
+                            
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <?php
+}
+?>

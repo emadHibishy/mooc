@@ -1,0 +1,51 @@
+      <!--sidebar start-->
+      <aside>
+        <div id="sidebar"  class="nav-collapse ">
+            <!-- sidebar menu start-->
+            <ul class="sidebar-menu" id="nav-accordion">
+                <li>
+                    <a class="active" href="index.php">
+                        <i class="icon-dashboard"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sub-menu">
+                    <a href="javascript:;" >
+                        <i class="icon-user"></i>
+                        <span>Users</span>
+                    </a>
+                    <ul class="sub">
+                        <li><a  href="users.php">ALL Users</a></li>
+                        <li><a  href="adduser.php">Add User</a></li>
+                        <li><a  href="usersgroups.php">ALL Users Groups</a></li>
+                        <li><a  href="addusergroup.php">Add User Group</a></li>
+                    </ul>
+                </li>
+                <li class="sub-menu">
+                    <a href="javascript:;" >
+                        <i class="icon-laptop"></i>
+                        <span>Courses</span>
+                    </a>
+                    <ul class="sub">
+                        <li><a  href="courses.php">ALL Courses</a></li>
+                        <li><a  href="addcourse.php">Add Course</a></li>
+                    </ul>
+                </li>
+
+            </ul>
+            <!-- sidebar menu end-->
+        </div>
+    </aside>
+    <!--sidebar end-->
+      <!--main content start-->
+      <section id="main-content">
+        <section class="wrapper">
+            <?php
+                if(!empty($_SESSION['errors'])){
+                    echo getErrors();
+                }
+                if(!empty($_SESSION['success'])){
+                    echo getSuccess();
+                }
+                
+            ?>

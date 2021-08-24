@@ -1,0 +1,38 @@
+<div class="row">
+    <?php
+    foreach($data as $course){
+    ?>
+    <div class="col-md-6">
+        <section class="panel">
+            <div class="panel-body" style="display: flex; align-items: center;">
+                <div class="col-md-6">
+                    <div class="pro-img-details">
+                        <img src="../<?php echo $course['course_cover'];?>" alt="">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <a href="course.php?id=<?php echo $course['course_id'];?>">
+                        <h4 class="pro-d-title text-primary">
+                            <?php echo $course['course_title'];?>
+                        </h4>
+                </a>
+                    <div class="product_meta">
+                        <span class="posted_in"> <strong>Category:</strong> <?php echo $course['category_name'];?></span>
+                    </div>
+                    <div class="m-bot15"> <strong>Price : </strong><span class="pro-price">$<?php echo $course['course_price'];?></span></div>
+                    <div>
+                        <!-- <a href="addcoursesection.php?id=<?php echo $course['course_id']; ?>" class="btn btn-block btn-success">Add Section</a> -->
+                        <a href="updatecourse.php?id=<?php echo $course['course_id'];?>" class="btn btn-block btn-info"><i class="icon-refresh"></i> Edit Course</a>
+                        <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST" style="display: inline;">
+                            <input type="hidden" name="id" value="<?php echo $course['course_id']; ?>">
+                            <button type="submit" class="btn btn-block btn-danger"><i class="icon-trash"></i> Delete Course</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <?php 
+    }
+    ?>
+</div>
