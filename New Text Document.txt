@@ -1,5 +1,0 @@
-<a href="javascript:history.go(-1)">link text here...</a>
-
-$previous = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : "javascript:history.go(-1)";
-<a href="<?= $previous ?>">Back</a>
-
