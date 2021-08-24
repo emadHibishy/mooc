@@ -231,25 +231,27 @@ class instructorController extends Controller
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $courseId = filter_var($_POST['course'], FILTER_SANITIZE_NUMBER_INT);
             $sectionId = filter_var($_POST['section'], FILTER_SANITIZE_NUMBER_INT);
+            $lessonUrl = filter_var($_POST['video'], FILTER_SANITIZE_URL);
+            $duration = filter_var($_POST['duration'], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
             $description= filter_var($_POST['description'], FILTER_SANITIZE_STRING);
             $title = filter_var($_POST['title'], FILTER_SANITIZE_STRING);
             $imgsTypes = array('jpg', 'jpeg', 'png');
-            echo $_POST['title'];
-            echo '<pre>';
-            print_r($_FILES['cover']);
-            // $imgType = explode('/',$_FILES['cover']['type'][0]);
-            // $extnsn = end($imgType);
-            // if(in_array($extnsn, $imgsTypes)){
-            //     $imgName = time(). rand(1,10000).$_FILES['cover']['name'][0];
-            //     if(move_uploaded_file($_FILES['cover']['tmp_name'][0], '../uploads/'.$imgName)){
-            //         if($this->courseModel->addCourse(Factory::generateCourseDataArray($courseName, $description, $coursePrice,'uploads/'.$imgName, 0,$categoryId, $_SESSION['user']['user_id']))){
-            //             Redirect::redirect('courses.php');
-            //         }else
-            //             $this->setError($this->courseModel->getError());
-            //     }
-            // }else{
-            //     $this->setError('Image must be of type jpg, jpeg or png');
-            // }
+            $imgType = explode('/',$_FILES['img']['type']);
+            $extnsn = strtolower(end($imgType));
+            if(in_array($extnsn, $imgsTypes)){
+                $imgName = time(). rand(1,10000).$_FILES['img']['name'][0];
+                if(move_uploaded_file($_FILES['img']['tmp_name'], '../uploads/'.$imgName)){
+                    $lessonModel = new coursesLessonsModel();
+                    if($lessonModel->addCourseLesson(Factory::generateCourseLessonDataArray($title, $description, $imgName, $lessonUrl, $duration, $sectionId, $courseId))){
+                        Redirect::redirect('javascript:history.go(-1)');
+                    }else
+                        $this->setError($this->courseModel->getError());
+                }else{
+                    $this->setError('unknown error while uploading image please try again later');
+                }
+            }else{
+                $this->setError('Image must be of type jpg, jpeg or png');
+            }
         } else {
             $sectionModel = new courseSectionsModel();
             if ( isset($_GET['id']) && isset($_GET['courseid']) ) {
@@ -273,7 +275,6 @@ class instructorController extends Controller
                                 'sections' => $courseSections,
                                 'sectionId' => $secId
                             ];
-                            $this->render($view, $data);
                         return $this->render($view, $data);
                         } else {
                             $this->setError('This Section don\'t belong to this course');
@@ -285,7 +286,7 @@ class instructorController extends Controller
                     $this->setError('Course Not Found');
                 }
             }
-            $this->render($view);
         }
+        $this->render($view);
     }
 }
