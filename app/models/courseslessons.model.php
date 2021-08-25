@@ -54,10 +54,10 @@ class coursesLessonsModel extends ModelHandler
         return $this->delete($id);
     }
     
-    // public function getCourseLessons($courseId)
-    // {
-    //     return $this->readByParams(' WHERE lesson_course = :lesson_course ORDER BY lesson_id', ['lesson_course' => $courseId]);
-    // }
+    public function getCourseLessons($courseId)
+    {
+        return $this->readByParams(' WHERE lesson_course = :lesson_course ORDER BY lesson_id', ['lesson_course' => $courseId]);
+    }
 
     public function getCountCourseLessons($courseId)
     {
@@ -75,26 +75,13 @@ class coursesLessonsModel extends ModelHandler
         return $this->read(' WHERE lesson_section = :lesson_section', ['lesson_section' => $sectionId]);
     }
 
-    // public function getLessons ($courseId, $instructorId)
-    // {
-    //     $stmt = 'SELECT cl.*, co.course_title, u.username 
-    //     FROM courses_lessons cl 
-    //     LEFT OUTER JOIN courses co ON cl.lesson_course = co.course_id 
-    //     LEFT OUTER JOIN users u ON cl.lesson_instructor = u.user_id 
-    //     WHERE cl.lesson_course = :lesson_course && cl.lesson_instructor = :lesson_instructor';
-    //     $stmt = static::$connection->prepare($stmt);
-    //     $stmt->bindValue(':lesson_course', $courseId, self::DATA_TYPE_INT);
-    //     $stmt->bindValue(':lesson_instructor', $instructorId, self::DATA_TYPE_INT);
-    //     if($stmt->execute())
-    //         $result  = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    //     else
-    //         $this->setError($stmt->errorInfo()[2]);
-    //     return isset($result) && is_array($result) && !empty($result) ? $result : null;
-    // }
-
     public function getLessonById($id)
     {
-        return $this->readByParams( static::$primaryKey, $id);
+        return $this->readByParams( [static::$primaryKey => $id]);
     }
     
+    public function isInstructorLesson ($lessonId, $instructorId)
+    {
+
+    }
 }

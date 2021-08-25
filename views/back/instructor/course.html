@@ -123,8 +123,12 @@ if (isset($data) && !empty($data)) {
                                             <p class="pull-left"><?php echo $lesson['lesson_duration']; ?></p>
                                             </td>
                                             <td>
-                                                <a href="updatelesson.php?id='.$lesson['lesson_id'].'" class="btn btn-info"><i class="icon-refresh"></i> Edit</a>
-                                                <a href="deletelesson.php?id='.$lesson['lesson_id'].'" class="btn btn-danger"><i class="icon-trash"></i> Delete</a>
+                                                <a href="updatelesson.php?id=<?php echo $lesson['lesson_id']?>" class="btn btn-info"><i class="icon-refresh"></i> Edit</a>
+                                                <form action="deletesectionlesson.php" method="POST" style="display: inline;">
+                                                    <input type="hidden" name="lesson_id" value="<?php echo $lesson['lesson_id']?>">
+                                                    <button type="submit" class="btn btn-danger"><i class="icon-trash"></i> Delete</button>
+                                                </form>
+                                                
                                             </td>
                                         </tr>
                                         <?php } ?>

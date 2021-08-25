@@ -1,0 +1,49 @@
+<?php if (is_array($data['lesson']) && !empty($data['lesson'])) {?>
+<section class="panel">
+    <header class="panel-heading">
+       Edit Course Lesson
+    </header>
+    <div class="panel-body">
+        <form class="form-horizontal tasi-form" method="POST" action="<?php echo $_SERVER['PHP_SELF']; ?>" enctype="multipart/form-data">
+            <div class="form-group">
+                <label class="col-sm-2 col-sm-2 control-label">Lesson Title</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="title" value="<?php echo $data['lesson']['lesson_title'] ?>" required>
+                </div>
+            </div>
+            <div class="form-group">
+                   <label class="form-label col-sm-2" for="customFile">Lesson Cover</label>
+                   <div class="col-sm-10">
+                        <input type="file" class="form-control" id="customFile" name="img" required/>
+                   </div>
+           </div>
+            <div class="form-group">
+                <label class="col-sm-2 col-sm-2 control-label">Lesson Url</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="video" value="<?php echo $data['lesson']['lesson_video'] ?>" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 col-sm-2 control-label">Lesson Duration</label>
+                <div class="col-sm-10">
+                    <input type="number" class="form-control" name="duration" value="<?php echo $data['lesson']['lesson_duration'] ?>" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="description" class="col-sm-2 control-label">Lesson Description</label>
+                <div class="col-sm-10">
+                    <textarea class="form-control" name="description" id="description" rows="5" required><?php echo $data['lesson']['lesson_description'] ?></textarea>
+                </div>
+            </div>
+            <input type="hidden" name="lesson_id"  value="<?php echo $data['lesson']['lesson_id'] ?>">
+            <input type="hidden" name="course" value="<?php echo $data['lesson']['lesson_course'] ?>">
+            <input type="hidden" name="section" value="<?php echo $data['lesson']['lesson_section'] ?>">
+            <input type="submit" value="Updata Lesson" class="btn btn-primary">
+        </form>
+    </div>
+</section>
+<?php } else { ?>
+<div class="alert alert-danger">
+    <p>No Data Found For this Lesson</p>
+</div>
+<?php } ?>

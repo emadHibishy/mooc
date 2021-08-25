@@ -91,5 +91,4 @@ class coursesModel extends ModelHandler
     {
         return $this->readByParams( [static::$primaryKey => $id]);
     }
-    
 }

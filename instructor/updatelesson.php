@@ -7,5 +7,6 @@ require_once MODELS . DIRECTORY_SEPARATOR . 'users.model.php';
 require_once MODELS . DIRECTORY_SEPARATOR . 'usergroup.model.php';
 require_once MODELS . DIRECTORY_SEPARATOR . 'coursesCategories.model.php';
 require_once MODELS . DIRECTORY_SEPARATOR . 'coursesLessons.model.php';
+require_once MODELS . DIRECTORY_SEPARATOR . 'coursesections.model.php';
 
 $admin = new instructorController();

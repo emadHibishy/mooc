@@ -6,6 +6,7 @@ class instructorController extends Controller
     private $userGroupModel;
     private $usersModel;
     private $catsModel;
+    private $lessonModel;
     public function __construct()
     {
         $this->checkPermission();
@@ -13,6 +14,7 @@ class instructorController extends Controller
         $this->courseModel = new coursesModel();
         $this->userGroupModel = new userGroupModel();
         $this->usersModel = new usersModel();
+        $this->lessonModel = new coursesLessonsModel();
         $this->_view();
     }
 
@@ -225,7 +227,6 @@ class instructorController extends Controller
     =========================
     * instructor can add lesson to section in the course
     */
-
     private function addsectionlesson($view)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -239,11 +240,11 @@ class instructorController extends Controller
             $imgType = explode('/',$_FILES['img']['type']);
             $extnsn = strtolower(end($imgType));
             if(in_array($extnsn, $imgsTypes)){
-                $imgName = time(). rand(1,10000).$_FILES['img']['name'][0];
+                $imgName = time(). rand(1,10000).$_FILES['img']['name'];
                 if(move_uploaded_file($_FILES['img']['tmp_name'], '../uploads/'.$imgName)){
-                    $lessonModel = new coursesLessonsModel();
-                    if($lessonModel->addCourseLesson(Factory::generateCourseLessonDataArray($title, $description, $imgName, $lessonUrl, $duration, $sectionId, $courseId))){
-                        Redirect::redirect('javascript:history.go(-1)');
+                    if($this->lessonModel->addCourseLesson(Factory::generateCourseLessonDataArray($title, $description, $imgName, $lessonUrl, $duration, $sectionId, $courseId))){
+                        $this->setSuccess('Lesson Added Successfully');
+                        Redirect::redirect("course.php?id={$courseId}");
                     }else
                         $this->setError($this->courseModel->getError());
                 }else{
@@ -288,5 +289,67 @@ class instructorController extends Controller
             }
         }
         $this->render($view);
+    }
+
+    /* 
+    ============================
+    =   delete section lesson  =
+    ============================
+    * instructor can delete lesson in the course
+    */
+    private function deletesectionlesson($view)
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $lessonId = (int)$_POST['lesson_id'];
+            $lesson = $this->lessonModel->getLessonById($lessonId);
+            if (is_array($lesson) && !empty($lesson)) {
+                $sectionModel = new courseSectionsModel();
+                $lessonSection = $sectionModel->getCourseSectionById($lesson['lesson_section']);
+                $lesson_course = $this->courseModel->getCourseById($lessonSection['section_course']);
+                if ($lesson_course['course_instructor'] == $_SESSION['user']['user_id']) {
+                    if ( $this->lessonModel->deleteCourseLesson($lessonId) ) {
+                        $this->setSuccess('Lesson Deleted Successfully');
+                        Redirect::redirect("course.php?id={$lesson_course['course_id']}");
+                        die;
+                    } else 
+                        $this->setError('Something went wrong please try later');
+                } else 
+                    $this->setError('You are not allowed to see this content');
+            } else 
+                $this->setError('No Such Lesson In the database');
+            Redirect::redirect("javascript:history.go(-1)");
+        } else {
+            Redirect::redirect('index.php');
+        }
+    }
+
+    /* 
+    ============================
+    =   update section lesson  =
+    ============================
+    * instructor can update lesson in the course
+    */
+    private function updatelesson ($view)
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+        } else {
+            $lessonId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+            $lesson = $this->lessonModel->getLessonById($lessonId);
+            if (is_array($lesson) && !empty($lesson)) {
+                $sectionModel = new courseSectionsModel();
+                $lessonSection = $sectionModel->getCourseSectionById($lesson['lesson_section']);
+                $lesson_course = $this->courseModel->getCourseById($lessonSection['section_course']);
+                if ($lesson_course['course_instructor'] == $_SESSION['user']['user_id']) {
+                    return $this->render($view, ['lesson' => $lesson]);
+                } else {
+                    $this->setError('You are not allowed to see this lesson');
+                    Redirect::redirect("course.php?id={$lesson_course['course_id']}"); 
+                }
+            } else {
+                $this->setError('No Such Lesson In the database');
+                Redirect::redirect("javascript:history.go(-1)");
+            }
+        }
     }
 }
