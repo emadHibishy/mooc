@@ -31,7 +31,7 @@ class Factory
             'course_cover'      => $cover,
             'course_category'   => $category,
             'course_instructor' => $instructor,
-            'course_instructor' => date('M jS Y', time())
+            'updated_at' => date('M jS Y', time())
         );
     }
 
@@ -71,6 +71,15 @@ class Factory
             'comment_parent'   => $parent,
             'comment_user'        => $user,
             'comment_lesson'    => $lesson,
+        );
+    }
+
+    public static function generateCourseReviewsDataArray($content, $course, $user)
+    {
+        return array(
+            'review_content' => $content,
+            'course_id'    => $course,
+            'user_id'        => $user,
         );
     }
 

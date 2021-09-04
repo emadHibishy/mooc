@@ -21,12 +21,21 @@
                     </div>
                     <div class="m-bot15"> <strong>Price : </strong><span class="pro-price">$<?php echo $course['course_price'];?></span></div>
                     <div>
-                        <!-- <a href="addcoursesection.php?id=<?php echo $course['course_id']; ?>" class="btn btn-block btn-success">Add Section</a> -->
                         <a href="updatecourse.php?id=<?php echo $course['course_id'];?>" class="btn btn-block btn-info"><i class="icon-refresh"></i> Edit Course</a>
-                        <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST" style="display: inline;">
-                            <input type="hidden" name="id" value="<?php echo $course['course_id']; ?>">
-                            <button type="submit" class="btn btn-block btn-danger"><i class="icon-trash"></i> Delete Course</button>
-                        </form>
+                        <button type="button" data-target="#deletecourse<?php echo $course['course_id'];?>" class="btn btn-block btn-danger delete-content"><i class="icon-trash"></i> Delete Course</button>
+                        <div class="overlay" id="deletecourse<?php echo $course['course_id'];?>">
+                            <div class="card">
+                                <form action="deletecourse.php" method="POST">
+                                    <p>
+                                        Do You Really Want to delete this Course?
+                                    </p>
+                                    <input type="hidden" name="course" value="<?php echo $course['course_id']; ?>">
+                                    <input type="submit" value="Delete" class="btn btn-danger">
+                                    <input type="button" value="Cancel" class="btn cancel">
+                                </form>
+                            </div>
+                        </div>
+                        
                     </div>
                 </div>
             </div>

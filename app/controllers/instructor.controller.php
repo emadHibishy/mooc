@@ -17,7 +17,7 @@ class instructorController extends Controller
         $this->lessonModel = new coursesLessonsModel();
         $this->_view();
     }
-
+    // Helper Functions
     /* 
     =====================
     =   view function   =
@@ -43,6 +43,27 @@ class instructorController extends Controller
         $this->render($view);
     }
 
+    /*===========================
+    =   is instructor Course    =
+    =============================
+    * takes the course id and check if the course belongs to the instructor
+    */
+    private function isInstructorCourse($courseId)
+    {
+        $course = $this->courseModel->getCourseById($courseId);
+        $instructorCourses = $this->courseModel->getCoursesByInstructor($_SESSION['user']['user_id']);
+        $isInsCourse = false;
+        if( is_array($instructorCourses) && !empty($instructorCourses) && is_array($course) && !empty($course) ) {
+            foreach($instructorCourses as $insCourse) {
+                if($course['course_id'] == $insCourse['course_id'])
+                    $isInsCourse = true;
+            }
+        }
+        return $isInsCourse;
+    }
+
+
+
     /* 
     ========================
     =   courses functions  =
@@ -57,6 +78,24 @@ class instructorController extends Controller
             $this->render($view);
         }else 
             $this->render($view, $courses);
+    }
+
+    /* 
+    ====================
+    =   delete course  =
+    ====================
+    * instructor can delete a course
+    */
+    private function deletecourse($view) {
+        if($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $courseId = (int)$_POST['course'];
+            if($this->courseModel->deleteCourse($courseId))
+                $this->setSuccess('Course Deleted Successfully');
+            else
+                $this->setError('Something went Wrong, Course didn\'t deleted');
+            Redirect::redirect('courses.php');
+        } else
+            Redirect::redirect('index.php');
     }
 
     /* 
@@ -78,7 +117,8 @@ class instructorController extends Controller
             if(in_array($extnsn, $imgsTypes)){
                 $imgName = time(). rand(1,10000).$_FILES['cover']['name'][0];
                 if(move_uploaded_file($_FILES['cover']['tmp_name'][0], '../uploads/'.$imgName)){
-                    if($this->courseModel->addCourse(Factory::generateCourseDataArray($courseName, $description, $coursePrice,'uploads/'.$imgName, 0,$categoryId, $_SESSION['user']['user_id']))){
+                    // echo $categoryId;
+                    if($this->courseModel->addCourse(Factory::generateCourseDataArray($courseName, $description, $coursePrice,'uploads/'.$imgName, $categoryId, $_SESSION['user']['user_id']))){
                         Redirect::redirect('courses.php');
                     }else
                         $this->setError($this->courseModel->getError());
@@ -121,7 +161,7 @@ class instructorController extends Controller
                 $course = $this->courseModel->getCourseById($courseId);
                 $imgName = substr($course['course_cover'], 7);
             }
-            if($this->courseModel->updateCourse($courseId, Factory::generateCourseDataArray($courseName, $description, $coursePrice,'uploads/'.$imgName, 0,$categoryId, $_SESSION['user']['user_id']))){
+            if($this->courseModel->updateCourse($courseId, Factory::generateCourseDataArray($courseName, $description, $coursePrice,'uploads/'.$imgName, $categoryId, $_SESSION['user']['user_id']))){
                 Redirect::redirect('courses.php');
             }else
                 $this->setError($this->courseModel->getError());
@@ -139,6 +179,35 @@ class instructorController extends Controller
         $this->render($view);
     }
 
+    /*===============================
+    =   approve student to course   =
+    =================================
+    * instructor can approve students registered th course
+    */
+    private function approvestudent($view)
+    {
+        $studentId = isset($_GET['studentid']) ? (int)$_GET['studentid'] : 0;
+        $courseId = isset($_GET['courseid']) ? (int)$_GET['courseid'] : 0;
+        $course = $this->courseModel->getCourseById($courseId);
+        $instructorCourses = $this->courseModel->getCoursesByInstructor($_SESSION['user']['user_id']);
+        if(is_array($course) && !empty($course)) {
+            if ( $this->isInstructorCourse($courseId) ) {
+                $courseStudentsModel = new courseStudentsModel();
+                if($courseStudentsModel->isStudentJoinedCourse($courseId, $studentId)){
+                    if($courseStudentsModel->confirmStudentSubscription($courseId, $studentId))
+                        $this->setSuccess('Student Approved Succeessfully');
+                    else
+                        $this->setError($courseStudentsModel->getError());
+                } else 
+                    $this->setError('student not registerd in this course');
+            } else
+                $this->setError('Sorry, You haven\'t the authority to see this content');
+            Redirect::redirect("course.php?id={$courseId}");
+        } else
+            $this->setError('Course Not Found');
+        Redirect::redirect('index.php');
+    }
+
     /* 
     =============================
     =   single course function  =
@@ -147,32 +216,35 @@ class instructorController extends Controller
     */
     private function course($view)
     {
-        $data = [];
-        $courseStudentsModel = new courseStudentsModel();
-        $courseSectionsModel = new courseSectionsModel();
-        $courseLessonsModel = new coursesLessonsModel();
         if (isset($_GET['id']) && is_numeric($_GET['id'])) {
             $courseId = filter_var($_GET['id'] , FILTER_SANITIZE_NUMBER_INT);
             $course = $this->courseModel->getCourseById($courseId);
+            $data = [];
+            $courseStudentsModel = new courseStudentsModel();
+            $courseSectionsModel = new courseSectionsModel();
+            $courseReviewsModel  = new courseReviewsModel();
             if (is_array($course) && !empty($course)) {
                 if($course['course_instructor'] == $_SESSION['user']['user_id']) {
-                    // course numbers info
-                    $courseStudentsNo = $courseStudentsModel->getCourseCountStudent($courseId);
+                    // course numbers 
+                    $students = $courseStudentsModel->getCourseStudents($courseId);
+                    $courseStudentsNo = is_array($students) && !empty($students) ? count($students) : 0;
                     $courseRate = $courseStudentsModel->getCourseRate($courseId);
                     $courseSectionsNo = $courseSectionsModel->getCountCourseSections($courseId);
-                    $courseLessonsNo = $courseLessonsModel->getCountCourseLessons($courseId);
+                    $courseLessonsNo = $this->lessonModel->getCountCourseLessons($courseId);
+                    $courseReviews = $courseReviewsModel->getCourseReviews($courseId);
                     $course = array_merge($course, ['students_no' => $courseStudentsNo]);
                     $course = array_merge($course, ['sections_no' => $courseSectionsNo]);
                     $course = array_merge($course, ['lessons_no' => $courseLessonsNo]);
                     $course = array_merge($course, ['rate' => $courseRate]);
                     $data = array_merge($data, ['course_details' => $course]);
+                    $data = array_merge($data, ['reviews' => $courseReviews]);
 
                     $course_sections_lessons = [];
                     // course actual data
                     $courseSections = $courseSectionsModel->getCourseSections($courseId);
                     if (is_array($courseSections) && !empty($courseSections)) {
                         foreach ($courseSections as $section) {
-                            $courseLessons = $courseLessonsModel->getSectionLessons($section['section_id']);
+                            $courseLessons = $this->lessonModel->getSectionLessons($section['section_id']);
                             if (is_array($courseLessons) && !empty($courseLessons)) {
                                 $section = array_merge($section, ['lessons' => $courseLessons]);
                             } else
@@ -182,7 +254,6 @@ class instructorController extends Controller
                     } else 
                         array_push($course_sections_lessons, 'No Sections Added to this course yet');
                     $data = array_merge($data, ['course' => $course_sections_lessons]);
-                    $students = $courseStudentsModel->getCourseStudents($courseId);
                     if (is_array($students) && !empty($students))
                         $data = array_merge($data, ['students' => $students]);
                     else
@@ -300,24 +371,13 @@ class instructorController extends Controller
     private function deletesectionlesson($view)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $lessonId = (int)$_POST['lesson_id'];
-            $lesson = $this->lessonModel->getLessonById($lessonId);
-            if (is_array($lesson) && !empty($lesson)) {
-                $sectionModel = new courseSectionsModel();
-                $lessonSection = $sectionModel->getCourseSectionById($lesson['lesson_section']);
-                $lesson_course = $this->courseModel->getCourseById($lessonSection['section_course']);
-                if ($lesson_course['course_instructor'] == $_SESSION['user']['user_id']) {
-                    if ( $this->lessonModel->deleteCourseLesson($lessonId) ) {
-                        $this->setSuccess('Lesson Deleted Successfully');
-                        Redirect::redirect("course.php?id={$lesson_course['course_id']}");
-                        die;
-                    } else 
-                        $this->setError('Something went wrong please try later');
-                } else 
-                    $this->setError('You are not allowed to see this content');
-            } else 
-                $this->setError('No Such Lesson In the database');
-            Redirect::redirect("javascript:history.go(-1)");
+            $lessonId = (int)$_POST['lesson'];
+            $courseId = (int)$_POST['course'];
+            if ($this->lessonModel->deleteCourseLesson($lessonId))
+                $this->setSuccess('Lesson Deleted Successfully');
+            else
+                $this->setError('Something went wrong, Lesson not Deleted');
+            Redirect::redirect("course.php?id={$courseId}");
         } else {
             Redirect::redirect('index.php');
         }
@@ -332,7 +392,39 @@ class instructorController extends Controller
     private function updatelesson ($view)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
+            $lessonId = (int)$_POST['lesson_id'];
+            $courseId = (int)$_POST['course'];
+            $sectionId = (int)$_POST['section'];
+            $title = filter_var($_POST['title'], FILTER_SANITIZE_STRING);
+            $description = filter_var($_POST['description'], FILTER_SANITIZE_STRING);
+            $duration = filter_var($_POST['duration'], FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION);
+            $videoUrl = filter_var($_POST['video'], FILTER_SANITIZE_URL);
+            $lesson = $this->lessonModel->getLessonById($lessonId); 
+            $imgName = $lesson['lesson_cover'];
+            if (isset($_FILES['img'])  && !empty($_FILES['img']['name'])) {
+                $imgsTypes = array('jpg', 'jpeg', 'png');
+                $imgType = explode('/',$_FILES['img']['type']);
+                $extnsn = strtolower(end($imgType));
+                if(in_array($extnsn, $imgsTypes)){
+                    $imgName = time(). rand(1,10000).$_FILES['img']['name'];
+                    if(move_uploaded_file($_FILES['img']['tmp_name'], '../uploads/'.$imgName)){
+                        
+                    }else{
+                        $this->setError('unknown error while uploading image please try again later');
+                        return Redirect::redirect($_SERVER['PHP_SELF']);
+                    }
+                }else{
+                    $this->setError('Image must be of type jpg, jpeg or png');
+                    return Redirect::redirect($_SERVER['PHP_SELF']);
+                }
+            }
+            if($this->lessonModel->updateCourseLesson($lessonId, Factory::generateCourseLessonDataArray($title,$description, $imgName, $videoUrl, $duration, $sectionId, $courseId))) {
+                $this->setSuccess('Lesson Updated Successfully');
+                return Redirect::redirect("course.php?id={$courseId}");
+            } else {
+                $this->setError('something went wrong');
+                return Redirect::redirect($_SERVER['PHP_SELF']);
+            }
         } else {
             $lessonId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
             $lesson = $this->lessonModel->getLessonById($lessonId);
@@ -350,6 +442,28 @@ class instructorController extends Controller
                 $this->setError('No Such Lesson In the database');
                 Redirect::redirect("javascript:history.go(-1)");
             }
+        }
+    }
+    
+    /* 
+    ===========================
+    =   delete course review  =
+    ===========================
+    * instructor can delete course review written by students
+    */
+    private function deletereview($view)
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $reviewId = (int)$_POST['review'];
+            $courseId = (int)$_POST['course'];
+            $reviewModel = new courseReviewsModel();
+            if ($reviewModel->deleteCourseReview($reviewId)) 
+                $this->setSuccess('Review Deleted Successfully');
+            else 
+                $this->setError('Something went wrong, try to delete later');
+            Redirect::redirect("course.php?id={$courseId}");
+        } else {
+            Redirect::redirect('index.php');
         }
     }
 }

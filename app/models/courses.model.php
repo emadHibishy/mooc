@@ -29,7 +29,7 @@ class coursesModel extends ModelHandler
         'course_cover'          => self::DATA_TYPE_STR,
         'course_category'       => self::DATA_TYPE_INT,
         'course_instructor'     => self::DATA_TYPE_INT,
-        'created_at'            => self::DaTA_TYPE_DATE
+        'updated_at'            => self::DaTA_TYPE_DATE
     );
 
     /*

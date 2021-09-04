@@ -30,7 +30,6 @@
 
   <body>
 
-  <section id="container" >
       <!--header start-->
       <header class="header white-bg">
             <div class="sidebar-toggle-box">
@@ -255,8 +254,8 @@
                     <!-- user login dropdown start-->
                     <li class="dropdown">
                         <a data-toggle="dropdown" class="dropdown-toggle" href="#">
-                            <img alt="" src="../assets/back/img/avatar1_small.jpg">
-                            <span class="username">Jhon Doue</span>
+                            <img alt="" src="../<?php echo $_SESSION['user']['image'] ?>">
+                            <span class="username"><?php echo $_SESSION['user']['username'] ?></span>
                             <b class="caret"></b>
                         </a>
                         <ul class="dropdown-menu extended logout">

@@ -97,9 +97,10 @@ class courseStudentsModel extends ModelHandler
         $stmt = static::$connection->prepare($stmt);
         $stmt->bindValue(':course_id', $courseId, self::DATA_TYPE_INT);
         $stmt->bindValue(':student_id', $studentId, self::DATA_TYPE_INT);
-        if($stmt->execute())
-            return true;
-        $this->setError($stmt->errorInfo()[2]);
+        if($stmt->execute()){
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return is_array($result) && !empty($result) ? true : false;
+        }
         return false;
     }
 

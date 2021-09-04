@@ -29,7 +29,7 @@ class coursesLessonsModel extends ModelHandler
         'lesson_description'    => self::DATA_TYPE_STR ,
         'lesson_cover'               => self::DATA_TYPE_STR ,
         'lesson_video'               => self::DATA_TYPE_STR ,
-        'lesson_duration'         => self::DATA_TYPE_INT ,
+        'lesson_duration'         => self::DATA_TYPE_DECIMAL ,
         'lesson_section'            => self::DATA_TYPE_INT,
         'lesson_course'             => self::DATA_TYPE_INT ,
     );

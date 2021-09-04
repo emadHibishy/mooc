@@ -22,8 +22,8 @@ if (isset($data) && !empty($data)) {
                         </p>
                         <div class="product_meta">
                             <span class="posted_in">
-                                <strong>Created At:</strong>
-                                <?php echo $data['course_details']['created_at'] ?>
+                                <strong>Last Updated:</strong>
+                                <?php echo $data['course_details']['updated_at'] ?>
                             </span>
                         </div>
 
@@ -78,6 +78,11 @@ if (isset($data) && !empty($data)) {
                                 Students Registered
                             </a>
                         </li>
+                        <li>
+                            <a data-toggle="tab" href="#comments">
+                                Reviews
+                            </a>
+                        </li>
                     </ul>
                 </header>
                 <div class="panel-body">
@@ -124,11 +129,20 @@ if (isset($data) && !empty($data)) {
                                             </td>
                                             <td>
                                                 <a href="updatelesson.php?id=<?php echo $lesson['lesson_id']?>" class="btn btn-info"><i class="icon-refresh"></i> Edit</a>
-                                                <form action="deletesectionlesson.php" method="POST" style="display: inline;">
-                                                    <input type="hidden" name="lesson_id" value="<?php echo $lesson['lesson_id']?>">
-                                                    <button type="submit" class="btn btn-danger"><i class="icon-trash"></i> Delete</button>
-                                                </form>
-                                                
+                                                <button type="button" data-target="#deletelesson<?php echo $lesson['lesson_id']?>" class="btn btn-danger delete-content"><i class="icon-trash"></i> Delete</button>
+                                                <div class="overlay" id="deletelesson<?php echo $lesson['lesson_id']?>">
+                                                    <div class="card">
+                                                        <form action="deletesectionlesson.php" method="POST">
+                                                            <p>
+                                                                Do You Really Want to delete this Lesson?
+                                                            </p>
+                                                            <input type="hidden" name="lesson" value="<?php echo $lesson['lesson_id']?>">
+                                                            <input type="hidden" name="course" value="<?php echo $data['course_details']['course_id']; ?>">
+                                                            <input type="submit" value="Delete" class="btn btn-danger">
+                                                            <input type="button" value="Cancel" class="btn cancel">
+                                                        </form>
+                                                    </div>
+                                                </div>
                                             </td>
                                         </tr>
                                         <?php } ?>
@@ -177,11 +191,11 @@ if (isset($data) && !empty($data)) {
                                     <tr>
                                         <td>
                                             <div class="task-thumb">
-                                                <img src="<?php echo $student['image'] ?>" alt="">
+                                                <img src="../<?php echo $student['image'] ?>" alt="">
                                             </div>
                                         </td>
                                         <td>
-                                            <a href="profile.php?id=<?php echo $student['user_id'] ?>">
+                                            <a href="../student/profile.php?id=<?php echo $student['user_id'] ?>">
                                                 <h4><?php echo $student['username'] ?></h4>
                                             </a>
                                         </td>
@@ -192,7 +206,7 @@ if (isset($data) && !empty($data)) {
                                             <?php if ($student['is_approved'] == 1){
                                                 echo '<button class="btn disabled btn-sm"><i class="icon-ok"></i></button>';
                                             } else {
-                                                echo '<a href="approvestudentd.php?id=$sudent[\'user_id\']" class="btn btn-success btn-sm">Approve</a>';
+                                                echo '<a href="approvestudent.php?studentid='.$student['user_id'].'&courseid='.$data['course_details']['course_id'].'" class="btn btn-success btn-sm">Approve</a>';
                                             } ?>
                                         </td>
                                     </tr>
@@ -206,6 +220,49 @@ if (isset($data) && !empty($data)) {
                                 </div>
                             <?php } ?>
                             
+                        </div>
+                        <div class="tab-pane" id="comments">
+                            <?php
+                            if(!empty($data['reviews'])){
+                                foreach($data['reviews'] as $review){
+                            ?>
+                            <div class="msg-time-chat">
+                                <a href="#" class="message-img">
+                                    <img class="avatar" src="../<?php echo $review['image'] ?>" alt="">
+                                </a>
+                                <div class="message-body msg-in">
+                                    <span class="arrow"></span>
+                                    <div class="text">
+                                        <div style="display: inline-block;">
+                                            <p class="attribution"><a href="#"><?php echo $review['username'] ?></a></p>
+                                        <p><?php echo $review['review_content'] ?></p>
+                                        </div>
+                                        <button type="button" data-target="#deletereview<?php echo $review['review_id']; ?>" class="btn btn-danger pull-right delete-content"><i class="icon-trash"></i> Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="overlay" id="deletereview<?php echo $review['review_id']; ?>">
+                                <div class="card">
+                                    <form action="deletereview.php" method="POST">
+                                        <p>
+                                            Do You Really Want to delete this review?
+                                        </p>
+                                        <input type="hidden" name="review" value="<?php echo $review['review_id']; ?>">
+                                        <input type="hidden" name="course" value="<?php echo $data['course_details']['course_id']; ?>">
+                                        <input type="submit" value="Delete" class="btn btn-danger">
+                                        <input type="button" value="Cancel" class="btn cancel">
+                                    </form>
+                                </div>
+                            </div>
+                            <section id="container" >
+                            <?php 
+                                }
+                            } else{
+                            ?>
+                            <div class="alert alert-danger">
+                                <p>No Reviews For this Course yet.</p>
+                            </div>
+                            <?php } ?>
                         </div>
                     </div>
                 </div>
