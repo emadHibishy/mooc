@@ -49,10 +49,10 @@ class coursesCategoriesModel extends ModelHandler
         return $this->read('', [], $sql);
     }
 
-    public function getCategory($field)
-    {
-        return $this->readByParams($field);
-    }
+    // public function getCategory($field)
+    // {
+    //     return $this->readByParams($field);
+    // }
 
     public function getCategoryById($id)
     {

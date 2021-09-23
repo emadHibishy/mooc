@@ -1,0 +1,40 @@
+<div class="container">
+    <!--portfolio start-->
+    <div class="gallery-container">
+        <ul id="filters" class="list-unstyled">
+            <li><a href="#" data-filter="*"> All</a></li>
+            <?php
+                if(isset($categories) && !empty($categories)) {
+                    foreach($categories as $cat){
+                        echo '<li><a href="#" data-filter=".cat_'.$cat['category_id'].'">'.$cat['category_name'].'</a></li>';
+                    }
+                }
+            ?>
+        </ul>
+        <div id="gallery" class="col-4 isotope" style="position: relative; overflow: hidden; height: 1466.34px;">
+            <?php
+                if(isset($courses) && !empty($courses)){
+                    foreach($courses as $course){
+                        ?>
+                        <div class="element cat_<?php echo $course['course_category'] ?> item view view-tenth" data-zlname="reverse-effect">
+                            <img src="<?php echo $course['course_cover'] ?>" alt="">
+                            <div class="mask">
+                                <h2><?php echo $course['course_title'] ?> </h2>
+                                <a data-zl-popup="link" href="course.php?id=<?php echo $course['course_id'] ?>">
+                                    <i class="icon-link"></i>
+                                </a>
+                                <a data-zl-popup="link2" class="fancybox" rel="group" href="<?php echo $course['course_cover'] ?>">
+                                    <i class="icon-search"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <?php
+                    }
+                }
+            ?>
+            
+        </div>
+    </div>
+    <!--portfolio end-->
+</div>

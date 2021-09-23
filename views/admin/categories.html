@@ -1,0 +1,62 @@
+<!-- page start-->
+<div class="row">
+    <div class="col-lg-12">
+        <section class="panel">
+            <header class="panel-heading">
+                All Categories
+            </header>
+            <div class="panel-body">
+                <section id="unseen">
+                    <table class="table table-bordered table-striped table-condensed">
+                    <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Created By</th>
+                        <th>Control</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        if(is_array($data) && !empty($data)){
+                            foreach ($data as $cat) {
+                                ?>
+                                <tr>
+                                    <td><?php echo $cat['category_name'] ;?></td>
+                                    <td><?php echo $cat['username'] ;?></td>
+                                    <td>
+                                        <a href="updatecategory.php?id=<?php echo $cat['category_id']?>" class="btn btn-info"><i class="icon-refresh"></i> Edit</a>
+                                        <button type="button" data-target="#deletecategory<?php echo $cat['category_id'];?>" class="btn btn-danger delete-content"><i class="icon-trash"></i> Delete Category</button>
+                                            <div class="overlay" id="deletecategory<?php echo $cat['category_id'];?>">
+                                                <div class="card">
+                                                    <form action="deletecategory.php" method="POST">
+                                                        <p>
+                                                            Do You Really Want to delete this Category?
+                                                        </p>
+                                                        <input type="hidden" name="category" value="<?php echo $cat['category_id']; ?>">
+                                                        <input type="submit" value="Delete" class="btn btn-danger">
+                                                        <input type="button" value="Cancel" class="btn cancel">
+                                                    </form>
+                                                </div>
+                                            </div>
+                                    </td>
+                                </tr>
+                                <?php
+                            } 
+                        } else{
+                            ?>
+                            <div class="alert alert-danger">
+                                <p class="text-danger">
+                                    No Categories Added Yet.
+                                </p>
+                            </div>
+                            <?php
+                        }
+                        ?>
+                    </tbody>
+                </table>
+                </section>
+            </div>
+        </section>
+    </div>
+</div>
+<!-- page end-->

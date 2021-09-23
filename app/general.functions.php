@@ -65,8 +65,8 @@ function invalidRedirect($depth = '')
             }
         }
         elseif($_SESSION['user']['group_id'] == 3){
-            if($uri !== 'student'){
-                Redirect::redirect($depth.'student/index.php');
+            if($uri !== 'front'){
+                Redirect::redirect($depth.'front/index.php');
                 exit;
             }
         }else{

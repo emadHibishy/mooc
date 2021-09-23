@@ -51,41 +51,50 @@ class coursesModel extends ModelHandler
     {
         return $this->delete($id);
     }
+
+    private function getCourseData($extra = '', $fields=[])
+    {
+        $sql = 'SELECT `c`.*, `cc`.`category_name`, `users`.`username` FROM `courses` `c` LEFT OUTER JOIN `courses_categories` `cc` ON `c`.`course_category` = `cc`.`category_id` LEFT OUTER JOIN `users` ON `c`.`course_instructor` = `users`.`user_id`';
+        return $this->read($extra, $fields, $sql);
+    }
+
+    public function getLatestCourses()
+    {
+        return $this->getCourseData(" ORDER BY `course_id` DESC LIMIT 10");
+    }
     
     public function getCourses()
     {
-        $sql = 'SELECT `c`.*, `cc`.`category_name`, `users`.`username` FROM `courses` `c` LEFT OUTER JOIN `courses_categories` `cc` ON `c`.`course_category` = `cc`.`category_id` LEFT OUTER JOIN `users` ON `c`.`course_instructor` = `users`.`user_id`';
-        return $this->read('', [], $sql);
+        return $this->getCourseData();
     }
 
     public function getCoursesByCategory($courseCategory)
     {
-        $sql = 'SELECT `c`.*, `cc`.`category_name`, `users`.`username` FROM `courses` `c` LEFT OUTER JOIN `courses_categories` `cc` ON `c`.`course_category` = `cc`.`category_id` LEFT OUTER JOIN `users` ON `c`.`course_instructor` = `users`.`user_id`';
-        return $this->read(' WHERE course_category = :course_category', ['course_category' => $courseCategory], $sql);
+        return $this->getCourseData(' WHERE course_category = :course_category', ['course_category' => $courseCategory]);
     }
 
     public function getCoursesByInstructor($Instructor)
     {
-        $sql = 'SELECT `c`.*, `cc`.`category_name`, `users`.`username` FROM `courses` `c` LEFT OUTER JOIN `courses_categories` `cc` ON `c`.`course_category` = `cc`.`category_id` LEFT OUTER JOIN `users` ON `c`.`course_instructor` = `users`.`user_id`';
-        return $this->read(' WHERE course_instructor = :course_instructor', ['course_instructor' => $Instructor], $sql);
+        return $this->getCourseData(' WHERE course_instructor = :course_instructor', ['course_instructor' => $Instructor]);
     }
 
-    public function searchCourses($keyword)
+    public function getCoursesByCategoryAndInstructor($categoryId, $InstructorId)
     {
-        $stmt = 'SELECT * FROM `courses` WHERE `course_title` LIKE  :keyword or `course_description` LIKE :keyword';
-        $stmt = static::$connection->prepare($stmt);
-        $stmt->bindValue(':keyword', "%$keyword%", self::DATA_TYPE_STR);
-        if($stmt->execute())
-            $result  = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        else
-            $this->setError($stmt->errorInfo()[2]);
-        return isset($result) && is_array($result) && !empty($result) ? $result : null;
+        return $this->getCourseData(' WHERE course_category = :course_category and course_instructor = :course_instructor', ['course_category' => $categoryId, 'course_instructor' => $InstructorId]);
     }
 
-    public function getCourse($field)
-    {
-        return $this->readByParams($field);
-    }
+    // public function searchCourses($keyword)
+    // {
+    //     $stmt = 'SELECT * FROM `courses` WHERE `course_title` LIKE  :keyword or `course_description` LIKE :keyword';
+    //     $stmt = static::$connection->prepare($stmt);
+    //     $stmt->bindValue(':keyword', "%$keyword%", self::DATA_TYPE_STR);
+    //     if($stmt->execute())
+    //         $result  = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    //     else
+    //         $this->setError($stmt->errorInfo()[2]);
+    //     return isset($result) && is_array($result) && !empty($result) ? $result : null;
+    // }
+
 
     public function getCourseById($id)
     {

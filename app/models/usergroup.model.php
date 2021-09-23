@@ -45,10 +45,10 @@ class userGroupModel extends ModelHandler
     {
         return $this->read();
     }
-    public function getUserGroup($field)
-    {
-        return $this->readByParams($field);
-    }
+    // public function getUserGroup($field)
+    // {
+    //     return $this->readByParams($field);
+    // }
     public function getUserGroupById($id)
     {
         return $this->readByParams( [static::$primaryKey => $id]);

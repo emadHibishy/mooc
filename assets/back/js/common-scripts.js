@@ -17,7 +17,7 @@ var Script = function () {
 
 //    sidebar dropdown menu auto scrolling
 
-    jQuery('#sidebar .sub-menu > a').click(function () {
+    jQuery('#sidebar .sub-menu > a').click(function () { 
         var o = ($(this).offset());
         diff = 250 - o.top;
         if(diff>0)

@@ -115,6 +115,8 @@ class ModelHandler
     protected function read($extra = '',  $fields = [], $sql = '')
     {
         $sql = empty($sql) ? 'SELECT * FROM '.static::$tableName : $sql;
+        // echo '<pre>';
+        // var_dump($extra);
         $stmt = $sql .  $extra;
         $stmt = static::$connection->prepare($stmt);
         if(!empty($extra) && !empty($fields)){

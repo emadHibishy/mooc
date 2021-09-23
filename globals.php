@@ -18,3 +18,9 @@ require_once APP . DS . 'general.functions.php';
 require_once MODELS . DS . 'model.php';
 require_once APP . DS . 'factory.php';
 require_once CONTROLLERS . DS . 'controller.php';
+require_once APP . DS . 'pluggable.php';
+
+foreach(glob(PLUGINS . DS . '*.php') as $plugin)
+{
+    require_once $plugin;
+}

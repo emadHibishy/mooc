@@ -1,0 +1,61 @@
+<!-- page start-->
+<div class="row">
+    <div class="col-lg-12">
+        <section class="panel">
+            <header class="panel-heading">
+                All Users
+            </header>
+            <div class="panel-body">
+                <section id="unseen">
+                    <table class="table table-bordered table-striped table-condensed">
+                    <thead>
+                    <tr>
+                        <th>Group Name</th>
+                        <th>Control</th>
+                        <!-- <th>Control</th> -->
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        if(is_array($data) && !empty($data)){
+                            foreach ($data as $group) {
+                            ?> 
+                                <tr>
+                                    <td><?php echo  $group['group_name'] ?></td>
+                                    <td>
+                                        <a href="updateusergroup.php?id=<?php echo $group['group_id']?>" class="btn btn-info"><i class="icon-refresh"></i> Edit</a>
+                                        <button type="button" data-target="#deleteusergroup<?php echo $group['group_id']?>" class="btn btn-danger delete-content"><i class="icon-trash"></i> Delete User Group</button>
+                                            <div class="overlay" id="deleteusergroup<?php echo $group['group_id']?>">
+                                                <div class="card">
+                                                    <form action="deleteusergroup.php" method="POST">
+                                                        <p>
+                                                            Do You Really Want to delete this User Group?
+                                                        </p>
+                                                        <input type="hidden" name="usergroup" value="<?php echo $group['group_id'] ?>">
+                                                        <input type="submit" value="Delete" class="btn btn-danger">
+                                                        <input type="button" value="Cancel" class="btn cancel">
+                                                    </form>
+                                                </div>
+                                            </div>
+                                    </td>
+                                </tr> 
+                            <?php
+                            } 
+                        } else {
+                            ?>
+                            <div class="alert alert-danger">
+                                <p class="text-danger">
+                                    No user Groups Added Yet
+                                </p>
+                            </div>
+                            <?php
+                        }
+                        ?>
+                    </tbody>
+                </table>
+                </section>
+            </div>
+        </section>
+    </div>
+</div>
+<!-- page end-->

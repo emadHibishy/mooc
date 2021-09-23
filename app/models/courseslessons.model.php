@@ -56,19 +56,20 @@ class coursesLessonsModel extends ModelHandler
     
     public function getCourseLessons($courseId)
     {
-        return $this->readByParams(' WHERE lesson_course = :lesson_course ORDER BY lesson_id', ['lesson_course' => $courseId]);
+        $sql = "SELECT `l`.* , `c`.`course_title`, `u`.`username` FROM `courses_lessons` `l` JOIN `courses` `c` ON `l`.`lesson_course` = `c`.`course_id` JOIN `users` `u` ON `c`.`course_instructor` = `u`.`user_id`";
+        return $this->read(" WHERE `c`.`course_id` = :course_id", ['course_id' => $courseId], $sql);
     }
 
-    public function getCountCourseLessons($courseId)
-    {
-        $stmt = 'SELECT COUNT(`lesson_id`) as `lessons` FROM `courses_lessons`';
-        $lessons = $this->read(' WHERE `lesson_course` = :lesson_course GROUP BY `lesson_course`', ['lesson_course' => $courseId], $stmt);
-        if (is_null($lessons) || empty($lessons)) {
-            return 'No lessons Added To This Course Yet';
-        } else {
-            return $lessons[0]['lessons'];
-        }
-    }
+    // public function getCountCourseLessons($courseId)
+    // {
+    //     $stmt = 'SELECT COUNT(`lesson_id`) as `lessons` FROM `courses_lessons`';
+    //     $lessons = $this->read(' WHERE `lesson_course` = :lesson_course GROUP BY `lesson_course`', ['lesson_course' => $courseId], $stmt);
+    //     if (is_null($lessons) || empty($lessons)) {
+    //         return 'No lessons Added To This Course Yet';
+    //     } else {
+    //         return $lessons[0]['lessons'];
+    //     }
+    // }
 
     public function getSectionLessons($sectionId)
     {

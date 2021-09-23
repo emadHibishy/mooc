@@ -1,0 +1,58 @@
+<!-- page start-->
+<div class="row">
+    <div class="col-lg-12">
+        <section class="panel">
+            <header class="panel-heading">
+                All Users
+            </header>
+            <div class="panel-body">
+                <section id="unseen">
+                    <table class="table table-bordered table-striped table-condensed">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>Course</th>
+                        <th>Category</th>
+                        <th>Instructor</th>
+                        <th>Control</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        if(isset($data['courses'])){
+                            foreach($data['courses'] as $course){
+                                ?>
+                                <tr>
+                                    <th></th>
+                                    <td><?php echo $course['course_title'] ;?></td>
+                                    <td><?php echo $course['category_name'] ;?></td>
+                                    <td><?php echo $course['username'] ;?></td>
+                                    <td>
+                                        <a href="courselessons.php?id=<?php echo $course['course_id']?>" class="btn btn-info"><i class="icon-refresh"></i> View Lessons</a>
+                                        <button type="button" data-target="#deletecourse<?php echo $course['course_id'];?>" class="btn btn-danger delete-content"><i class="icon-trash"></i> Delete Course</button>
+                                        <div class="overlay" id="deletecourse<?php echo $course['course_id'];?>">
+                                            <div class="card">
+                                                <form action="deletecourse.php" method="POST">
+                                                    <p>
+                                                        Do You Really Want to delete this Course?
+                                                    </p>
+                                                    <input type="hidden" name="course" value="<?php echo $course['course_id']; ?>">
+                                                    <input type="submit" value="Delete" class="btn btn-danger">
+                                                    <input type="button" value="Cancel" class="btn cancel">
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <?php
+                            }
+                        }
+                        ?>
+                    </tbody>
+                </table>
+                </section>
+            </div>
+        </section>
+    </div>
+</div>
+<!-- page end-->

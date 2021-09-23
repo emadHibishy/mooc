@@ -129,21 +129,18 @@ class adminController extends Controller
     */
     private function deletecategory($view)
     {
-        $id = isset($_GET) && is_numeric($_GET['id']) ? $_GET['id'] : 0;
-        if($id > 0){
-            $category = $this->catModel->getCategoryById($id);
-            if(!empty($category)){
-                if($this->catModel->deleteCategory($id)){
+        if($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $categoryId = (int)$_POST['category'];
+            $category = $this->catModel->getCategoryById($categoryId);
+            if(is_array($category) && !empty($category)) {
+                if($this->catModel->deleteCategory($categoryId)){
                     $this->setSuccess('Category Deleted Successfully');
-                    return Redirect::redirect('categories.php');
                 } else
                     $this->setError($this->catModel->getError());
-            } else
+            } else 
                 $this->setError('Category Not Found');
-            
-        }else
-            $this->setError('Category Not Found');
-        $this->render($view);
+        }
+        Redirect::redirect('categories.php');
     }
 
     /* 
@@ -154,20 +151,8 @@ class adminController extends Controller
     */
     private function users($view)
     {
-        if($_SERVER['REQUEST_METHOD'] === 'POST'){
-            $id = filter_var($_POST['id'], FILTER_SANITIZE_NUMBER_INT);
-            if($this->usersModel->deleteUser($id)){
-                $this->setSuccess('User Deleted Successfully');
-                Redirect::redirect('users.php');
-            }else{
-                $this->setError($this->userGroupModel->getError());
-                Redirect::redirect('users.php');
-            }
-        }else{
-            $users = $this->usersModel->getUsers();
-            $this->render($view, $users);
-        }
-        
+        $users = $this->usersModel->getUsers();
+        $this->render($view, $users);
     }
 
     /* 
@@ -188,7 +173,7 @@ class adminController extends Controller
             if(strlen($username) < 4){
                 $this->setError('Username must be more than 3 letters');
                 $this->render($view);
-            }elseif(strlen($email < 10)){
+            }elseif(strlen(strlen($email) < 10)){
                 $this->setError('email must be more than 10 letters');
                 $this->render($view);
             }
@@ -247,6 +232,22 @@ class adminController extends Controller
         $this->render($view);
     }
 
+    private function deleteuser($view)
+    {
+        if($_SERVER['REQUEST_METHOD'] === 'POST'){
+            $userId = (int)$_POST['user'];
+            $user = $this->usersModel->getUserById($userId);
+            if(is_array($user) && !empty($user)){
+                if($this->usersModel->deleteUser($userId))
+                    $this->setSuccess('User Deleted Successfully');
+                else
+                    $this->setError($this->usersModel->getError());
+            }else
+                $this->setError('User Not Found');
+        }
+        Redirect::redirect('users.php');
+    }
+
     /* 
     =============================
     =   users groups functions  =
@@ -256,19 +257,8 @@ class adminController extends Controller
     */
     private function usersgroups($view)
     {
-        if($_SERVER['REQUEST_METHOD'] === 'POST'){
-            $id = filter_var($_POST['id'], FILTER_SANITIZE_NUMBER_INT);
-            if($this->userGroupModel->deleteUserGroup($id)){
-                $this->setSuccess('Group Deleted Successfully');
-                Redirect::redirect('usersgroups.php');
-            }else{
-                $this->setError($this->userGroupModel->getError());
-                Redirect::redirect('usersgroups.php');
-            }
-        }else{
-            $usersGroups = $this->userGroupModel->getUserGroups();
-            $this->render($view, $usersGroups);
-        }
+        $usersGroups = $this->userGroupModel->getUserGroups();
+        $this->render($view, $usersGroups);
     }
 
     /* 
@@ -328,6 +318,126 @@ class adminController extends Controller
             $this->setError('Group Not Found');
         }
         $this->render($view);
+    }
+
+    /*
+    =========================
+    =   delete user group   =
+    =========================
+    * admin can delete user grouop
+    */
+    private function deleteusergroup($view)
+    {
+        if($_SERVER['REQUEST_METHOD'] === 'POST'){
+            $usergroupId = (int)$_POST['usergroup'];
+            $usergroup = $this->userGroupModel->getUserGroupById(($usergroupId));
+            if(is_array($usergroup) && !empty($usergroup)){
+                if($this->userGroupModel->deleteUserGroup(($usergroupId)))
+                    $this->setSuccess('Usergroup Deleted Successfully');
+                else
+                    $this->setError($this->userGroupModel->getError());
+            }else
+                $this->setError('Usergroup Not Found');
+        }
+        Redirect::redirect('usersgroups.php');
+    }
+
+    /*
+    =========================
+    =   Courses Functions   =
+    =========================
+    */
+
+    /*
+    =====================
+    =   get courses     =
+    =====================
+    * get all courses
+    * or get category courses
+    * or get instructor courses
+    */
+    private function courses($view)
+    {
+        $coursesModel = new coursesModel();
+        $data = array();
+        $courses = $coursesModel->getCourses();
+        if (is_array($courses) && !empty($courses)){
+            $courses = do_filter('display_courses', $courses);
+            $data['courses'] = $courses;
+        } else {
+            $this->setError('No courses Found');
+            return $this->render($view);
+        } 
+        $this->render($view, $data);
+    }
+
+    /* 
+    =====================
+    =   delete course   =
+    =====================
+    * admin can delete course
+    */
+    private function deletecourse($view)
+    {
+        if($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $coursesModel = new coursesModel();
+            $courseId = (int)$_POST['course'];
+            $course = $coursesModel->getCourseById($courseId);
+            if(is_array($course) && !empty($course)) {
+                if($coursesModel->deleteCourse($courseId))
+                    $this->setSuccess('Course Deleted Successfully');
+                else
+                    $this->setError($coursesModel->getError());
+            } else 
+                $this->setError('Course Not Found');
+        }
+        return Redirect::redirect('courses.php');
+    }
+
+    /* 
+    =========================
+    =   get course lessons  =
+    =========================
+    * admin can see course lessons
+    */
+    private function courselessons($view)
+    {
+        $coursesModel = new coursesModel();
+        $courseId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+        $course = $coursesModel->getCourseById($courseId);
+        if(is_array($course) && !empty($course)) {
+            $courseLessonsModel = new coursesLessonsModel();
+            $courseLessons = $courseLessonsModel->getCourseLessons($courseId);
+            if(is_array($courseLessons) && !empty($courseLessons)) 
+                return $this->render($view, ['lessons' => $courseLessons]);
+            else 
+                $this->setError('No Lessons added for this course Yet');
+        } else
+            $this->setError('Course Not Found');
+        $this->render($view);
+    }
+
+    /* 
+    =====================
+    =   delete lesson   =
+    =====================
+    * admin has the permision to delete lesson
+    */
+    private function deletelesson($view)
+    {
+        if($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $lessonId = (int)$_POST['lesson'];
+            $courseLessonsModel = new coursesLessonsModel();
+            $lesson = $courseLessonsModel->getLessonById($lessonId);
+            if (is_array($lesson) && !empty($lesson)) {
+                if ($courseLessonsModel->deleteCourseLesson($lessonId))
+                    $this->setSuccess('Lesson Deleted Successfully');
+                else
+                    $this->setError($courseLessonsModel->getError());
+            } else 
+                $this->setError('Lesson Not Found');
+        }
+        Redirect::redirect('courses.php');
     }
 
 }

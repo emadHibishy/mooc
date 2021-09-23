@@ -62,17 +62,17 @@ class usersModel extends ModelHandler
         return $this->read(' WHERE group_id = :group_id', 'group_id',$groupId);
     }
 
-    public function searchUsers($keyword)
-    {
-        $stmt = 'SELECT * FROM `users` WHERE `username` LIKE  :keyword or `email` LIKE :keyword';
-        $stmt = static::$connection->prepare($stmt);
-        $stmt->bindValue(':keyword', "%$keyword%", self::DATA_TYPE_STR);
-        if($stmt->execute())
-            $result  = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        else
-            $this->setError($stmt->errorInfo()[2]);
-        return isset($result) && is_array($result) && !empty($result) ? $result : null;
-    }
+    // public function searchUsers($keyword)
+    // {
+    //     $stmt = 'SELECT * FROM `users` WHERE `username` LIKE  :keyword or `email` LIKE :keyword';
+    //     $stmt = static::$connection->prepare($stmt);
+    //     $stmt->bindValue(':keyword', "%$keyword%", self::DATA_TYPE_STR);
+    //     if($stmt->execute())
+    //         $result  = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    //     else
+    //         $this->setError($stmt->errorInfo()[2]);
+    //     return isset($result) && is_array($result) && !empty($result) ? $result : null;
+    // }
 
     public function login($username, $password)
     {

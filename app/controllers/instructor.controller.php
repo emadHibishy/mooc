@@ -169,13 +169,17 @@ class instructorController extends Controller
             $id = is_numeric($_GET['id']) ? $_GET['id'] : 0;
             $course = $this->courseModel->getCourseById($id);
             $categories = $this->catsModel->getCategories();
-            if(!empty($course))
-                return $this->render($view, [$course, $categories]);
-            else 
-                $this->setError('Course Not Found');
-        }else{
+            if($course['course_instructor'] == $_SESSION['user']['user_id']) {
+                if(!empty($course))
+                    return $this->render($view, [$course, $categories]);
+                else 
+                    $this->setError('Course Not Found');
+            } else{
+                $this->setError('You are not allowed to see this content');
+                return Redirect::redirect("course.php?id={$course['course_id']}");
+            }
+        }else
             $this->setError('Course Not Found');
-        }
         $this->render($view);
     }
 
@@ -189,9 +193,8 @@ class instructorController extends Controller
         $studentId = isset($_GET['studentid']) ? (int)$_GET['studentid'] : 0;
         $courseId = isset($_GET['courseid']) ? (int)$_GET['courseid'] : 0;
         $course = $this->courseModel->getCourseById($courseId);
-        $instructorCourses = $this->courseModel->getCoursesByInstructor($_SESSION['user']['user_id']);
         if(is_array($course) && !empty($course)) {
-            if ( $this->isInstructorCourse($courseId) ) {
+            if ($course['course_instructor'] == $_SESSION['user']['user_id'] ) {
                 $courseStudentsModel = new courseStudentsModel();
                 if($courseStudentsModel->isStudentJoinedCourse($courseId, $studentId)){
                     if($courseStudentsModel->confirmStudentSubscription($courseId, $studentId))
@@ -259,8 +262,10 @@ class instructorController extends Controller
                     else
                         $data = array_merge($data, ['students' => 'No students Registered in this Course yet']);
                     return $this->render($view, $data);
-                } else 
+                } else {
                     $this->setError('Not Permitted to see this content');
+                    return Redirect::redirect('courses.php');
+                }
             } else
                 $this->setError($this->courseModel->getError());
         } else 
@@ -330,33 +335,34 @@ class instructorController extends Controller
                 $secId = filter_var($_GET['id'], FILTER_SANITIZE_NUMBER_INT);
                 $courseId = filter_var($_GET['courseid'], FILTER_SANITIZE_NUMBER_INT);
                 $course = $this->courseModel->getCourseById($courseId);
-                if ( is_array($course) && !empty($course) ) {
-                    $section = $sectionModel->getCourseSectionById($secId);
-                    if (is_array($section) && !empty($section)) {
-                        $courseSections = $sectionModel->getCourseSections($courseId);
-                        $isCourseSection = false;
-                        foreach ( $courseSections as $courseSection ) {
-                            if ($courseSection['section_id'] === $section['section_id']) {
-                                $isCourseSection = true;
-                                break;
-                            } 
-                        }
-                        if ($isCourseSection) {
-                            $data = [
-                                'course' => $course,
-                                'sections' => $courseSections,
-                                'sectionId' => $secId
-                            ];
-                        return $this->render($view, $data);
-                        } else {
-                            $this->setError('This Section don\'t belong to this course');
-                        }
-                    } else {
-                        $this->setError('Course Section Not Found');
-                    }
-                } else {
-                    $this->setError('Course Not Found');
-                }
+                if($course['course_instructor'] == $_SESSION['user']['user_id']) {
+                    if ( is_array($course) && !empty($course) ) {
+                        $section = $sectionModel->getCourseSectionById($secId);
+                        if (is_array($section) && !empty($section)) {
+                            $courseSections = $sectionModel->getCourseSections($courseId);
+                            $isCourseSection = false;
+                            foreach ( $courseSections as $courseSection ) {
+                                if ($courseSection['section_id'] === $section['section_id']) {
+                                    $isCourseSection = true;
+                                    break;
+                                } 
+                            }
+                            if ($isCourseSection) {
+                                $data = [
+                                    'course' => $course,
+                                    'sections' => $courseSections,
+                                    'sectionId' => $secId
+                                ];
+                                return $this->render($view, $data);
+                            } else 
+                                $this->setError('This Section don\'t belong to this course');
+                        } else 
+                            $this->setError('Course Section Not Found');
+                    } else 
+                        $this->setError('Course Not Found');
+                } else 
+                    $this->setError('You have not the authority to see this content');
+                return Redirect::redirect("course.php?id={$course['course_id']}");
             }
         }
         $this->render($view);

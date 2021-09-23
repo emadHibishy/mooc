@@ -1,0 +1,59 @@
+<!-- page start-->
+<div class="row">
+    <div class="col-lg-12">
+        <section class="panel">
+            <header class="panel-heading">
+                All Course Lessons
+            </header>
+            <div class="panel-body">
+                <?php
+                    if(isset($data['lessons'])) {
+                ?>
+                <section id="unseen">
+                    <table class="table table-bordered table-striped table-condensed">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>Lesson</th>
+                        <th>Course</th>
+                        <th>Instructor</th>
+                        <th>Control</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                            foreach($data['lessons'] as $lesson){
+                                ?>
+                                <tr>
+                                    <th></th>
+                                    <td><?php echo $lesson['lesson_title'] ;?></td>
+                                    <td><?php echo $lesson['course_title'] ;?></td>
+                                    <td><?php echo $lesson['username'] ;?></td>
+                                    <td>
+                                        <button type="button" data-target="#deletelesson<?php echo $lesson['lesson_id'];?>" class="btn btn-danger delete-content"><i class="icon-trash"></i> Delete Lesson</button>
+                                        <div class="overlay" id="deletelesson<?php echo $lesson['lesson_id'];?>">
+                                            <div class="card">
+                                                <form action="deletelesson.php" method="POST">
+                                                    <p>
+                                                        Do You Really Want to delete this Lesson?
+                                                    </p>
+                                                    <input type="hidden" name="lesson" value="<?php echo $lesson['lesson_id']; ?>">
+                                                    <input type="submit" value="Delete" class="btn btn-danger">
+                                                    <input type="button" value="Cancel" class="btn cancel">
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <?php
+                            }
+                        ?>
+                    </tbody>
+                </table>
+                </section>
+                <?php } ?>
+            </div>
+        </section>
+    </div>
+</div>
+<!-- page end-->

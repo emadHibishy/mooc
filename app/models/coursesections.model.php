@@ -48,16 +48,16 @@ class courseSectionsModel extends ModelHandler
         return $this->read(' WHERE section_course = :section_course ORDER BY section_id', ['section_course' => $courseId], 'SELECT `se`.*, `c`.`course_title` FROM `courses_sections` `se` LEFT OUTER JOIN `courses` `c` ON `se`.`section_course` = `c`.`course_id`');
     }
 
-    public function getCountCourseSections($courseId)
-    {
-        $stmt = 'SELECT COUNT(`section_id`) as `sections` FROM `courses_sections`';
-        $sections = $this->read(' WHERE `section_course` = :section_course GROUP BY `section_course`', ['section_course' => $courseId], $stmt);
-        if (is_null($sections) || empty($sections)) {
-            return 'No Sections Added To This Course Yet';
-        } else {
-            return $sections[0]['sections'];
-        }
-    }
+    // public function getCountCourseSections($courseId)
+    // {
+    //     $stmt = 'SELECT COUNT(`section_id`) as `sections` FROM `courses_sections`';
+    //     $sections = $this->read(' WHERE `section_course` = :section_course GROUP BY `section_course`', ['section_course' => $courseId], $stmt);
+    //     if (is_null($sections) || empty($sections)) {
+    //         return 'No Sections Added To This Course Yet';
+    //     } else {
+    //         return $sections[0]['sections'];
+    //     }
+    // }
 
     public function getCourseSectionById($id)
     {
